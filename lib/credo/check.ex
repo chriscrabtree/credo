@@ -719,13 +719,15 @@ defmodule Credo.Check do
       if trigger == Issue.no_trigger() do
         trigger
       else
-        to_string(trigger)
+        to_valid_string(trigger)
       end
+
+    message = to_valid_string(opts[:message])
 
     %Issue{
       priority: priority,
       filename: source_file.filename,
-      message: opts[:message],
+      message: message,
       trigger: trigger,
       line_no: line_no,
       column: column,
@@ -736,6 +738,7 @@ defmodule Credo.Check do
     |> add_column_if_missing(trigger, line_no, column, source_file)
     |> add_check_and_category(check, issue_category)
   end
+
 
   defp add_check_and_category(issue, check, issue_category) do
     %Issue{
@@ -879,5 +882,11 @@ defmodule Credo.Check do
       {:module, _} -> true
       {:error, _} -> false
     end
+  end
+
+  defp to_valid_string(binary) do
+    binary
+    |> to_string()
+    |> String.replace_invalid()
   end
 end
